@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from web.views import login
+from web.views import login, check_token, get_user_info
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login.html', login),
+    url(r'^check_token.html', check_token),
+    url(r'^get_user_info.html', get_user_info),
 ]

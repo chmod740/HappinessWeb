@@ -2,7 +2,7 @@ from django.shortcuts import render
 from web.models import User
 from time import time
 from web.tools.md5 import curlmd5
-from web.tools.json_tool import dict_to_json
+from web.tools.json_tool import dict_to_json, class_to_dict
 from django.http import HttpResponse
 
 """
@@ -22,4 +22,35 @@ def login(request):
         result = {'result': 0}
     return HttpResponse(dict_to_json(result))
 
+"""
+验证token
+"""
+def check_token(req):
+    phone_num = req.GET.get('phone_num')
+    token = req.GET.get('token')
+    users = User.objects.filter(phone_num__exact=phone_num, token__exact=token)
+    if len(users) > 0:
+        result = {'result': 1}
+    else:
+        result = {'result': 0}
+    return HttpResponse(dict_to_json(result))
+
+"""
+得到用户的个人信息
+"""
+def get_user_info(req):
+    phone_num = req.GET.get('phone_num')
+    token = req.GET.get('token')
+    users = User.objects.filter(token__exact=token, phone_num__exact=phone_num)
+    if len(users) > 0:
+        user = users[0]
+        user.register_time = str(user.register_time)
+        user_dict = class_to_dict(user)
+        user_dict['result'] = 1
+        user_dict.pop('_state')
+        user_dict.pop('register_time')
+        user_dict.pop('password')
+    else:
+        user_dict = {'result': 0}
+    return HttpResponse(dict_to_json(user_dict))
 
